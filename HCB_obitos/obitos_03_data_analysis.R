@@ -60,7 +60,7 @@ df4 <- df3[, c("time_days", "died", disease_dichot_vars, symptom_dichot_vars)]
 var_family = "surv"
 var_importance = "none"
 
-# takes a while to run...
+# takes about 10 minutes to run 10,000 trees...
 fit <- rfsrc(
   formula = Surv(time_days, died) ~ .,
   ntree = 10000,
@@ -103,18 +103,28 @@ dev.off()
 # fit <- coxph(Surv(time_days, died) ~ idade + sexo + oms_score, data = df)
 # fit <- coxph(Surv(time_days, event_var) ~ oms_score, data = df3)
 # fit <- coxph(Surv(time_days, event_var) ~ Hb, data = df3)
-fit <- coxph(Surv(time_days, died) ~ Sexo, data = df)
-summary(fit)
+library(survival)
+fit1 <- coxph(Surv(time_days, died) ~ Sexo, data = df3)
+summary(fit1)
 
-basehaz(fit)
+basehaz(fit1)
 
 # Kaplan-Meier estimator
 #-- no strata
-fit2 <- survfit(Surv(time_days, died) ~ 1, data = df)
-plot(fit2)
+jpeg("HCB_obitos/obitos_kmplot_nostrata.jpg")
+fit2 <- survfit(Surv(time_days, died) ~ 1, data = df3)
+plot(fit2, 
+  xlab = "Survival time (days)", ylab = "Proportion surviving",
+  main = "Survival time among all patients")
+dev.off()
 
-fit3 <- survfit(Surv(time_days, died) ~ onTARV, data = df)
-plot(fit3)
+
+jpeg("HCB_obitos/obitos_kmplot_tarv.jpg")
+fit3 <- survfit(Surv(time_days, died) ~ onTARV, data = df3)
+plot(fit3,
+  xlab = "Survival time (days)", ylab = "Proportion surviving",
+  main = "Survival time stratified by whether patient receives ART")
+dev.off()
   
 median(df$time_days)
 summary(df$time_days)
