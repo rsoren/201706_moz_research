@@ -1,0 +1,13 @@
+"variable","level","count","n_nonmissing","n_total","pct_among_nonmissing","pct_among_total"
+"N12Astenia","TRUE",125,188,188,66.49,66.49
+"N11Perdadepeso","TRUE",96,188,188,51.06,51.06
+"N9Anorexia","TRUE",92,188,188,48.94,48.94
+"N1Tosse","TRUE",84,188,188,44.68,44.68
+"N10Febre","TRUE",82,188,188,43.62,43.62
+"N2Dispneia","TRUE",72,188,188,38.3,38.3
+"N8Diareia","TRUE",69,188,188,36.7,36.7
+"N7Vomito","TRUE",53,188,188,28.19,28.19
+"N5Cefaleia","TRUE",37,188,188,19.68,19.68
+"N4Confusaomental","TRUE",25,188,188,13.3,13.3
+"N3Sudoresenocturna","TRUE",19,188,188,10.11,10.11
+"N6Regideznanuca","TRUE",7,188,188,3.72,3.72
