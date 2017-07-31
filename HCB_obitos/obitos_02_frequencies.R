@@ -142,7 +142,7 @@ other_results <- lapply(other_var_list, get_freq, data = df4)
 other_results2 <- do.call("rbind", other_results)
 
 write.csv(
-  x = symptom_results2, 
+  x = other_results2, 
   file = "HCB_obitos/obitos_frequencies_other.csv",
   row.names = FALSE
 )
