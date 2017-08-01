@@ -21,7 +21,7 @@ df2 <- readRDS("_intermediate_files/tmps_data_processed.RDS")
 # 1. Get frequencies for each disability variable
 
 df3 <- df2 %>%
-  select(-yrsurvey) %>%
+  select(-yrsurvey, -anos) %>%
   reshape2::melt(id.vars = c("provincia", "sexo", "idade_gt7")) %>%
   group_by(provincia, sexo, idade_gt7, variable, value) %>%
   summarize(count = n() ) %>%

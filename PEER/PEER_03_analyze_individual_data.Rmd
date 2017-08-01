@@ -211,7 +211,12 @@ get_ci <- function(model, variable, exponentiate = FALSE) {
 
 ```
 
-```{r}
+Here is some example text
+
+
+
+
+```{r }
 
 # colheita --> entrega
 # Time from sample collection to receiving PCR result

@@ -60,6 +60,9 @@ df[df$US == "CS Munhava" &
     df$coorte == "00", "numero_cca_expost_HIV_ref_CPP_CCR_inscrt"] <- 136
 
 
+saveRDS(df, "_intermediate_files/PEER_processed_data.RDS")
+
+
 run_sw_analysis <- function(numerator, denominator) {
   
   # numerator <- "numero_mulheres_HIV_mais_de_duas_CPP" # dev variable

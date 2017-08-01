@@ -7,9 +7,15 @@
 
 library(dplyr)
 library(data.table)
+library(gmodels)
+
 
 df_in <- fread("_data/INCOMAS_DATA_2017-07-24_0836.csv") %>%
   as.data.frame(.)
+
+df_in <- read.csv("_data/INCOMAS_DATA_2017-07-24_0836.csv")
+
+
 
 
 # first part, household survey
@@ -27,11 +33,70 @@ df_in <- fread("_data/INCOMAS_DATA_2017-07-24_0836.csv") %>%
 # -- use the variable 'result2' to know which lines correspond to the 
 #    second survey (inquerito individual)
 # 
+
+# What type of analysis to do?
+
+# Simple frequencies by age and location
+# -- Create a variable that tells whether it's a woman 15-49 and/or guardian
+#      Use dichotomous (is or isn't woman 15-49 AND legal guardian)
+# -- Age groups (<18, 18+)
+# -- Rural and urban
+# -- Province
+# -- Everything stratified by province (split other variables by province)
+#
+# logistic regression analysis
+# 
+# Outcomes of interest
+# -- diarrhea in the last two weeks
+#    * mother's age
+#    * child's age
+#    * urban or rural
+#    * province
+# -- fever in the last two weeks
+#    * mother's age
+#    * child's age
+#    * urban or rural
+#    * province
+# 
+
+# Where did you get treatment?
+# select329 is where did you go FIRST for treatment ** we want this 
+# select328 is where are ALL of the places you went for treatment
+# For fevers, use select330
+# -- During the period in which the child was sick, did you take treatment?
+# -- variable select331 is which type treatment
+
+# -- among mothers with sick children, whether or not goes to 
+#    tradtional healer or market for treatment
+#
+# For diarrhea, use select308: Did you seek a consultation
+# If so, where (select309)
+
+
+
+# Think about including PCR breaking as a covariate
+# Look in Brad on the conversation with James
+
+
+
+
 household_vars <- c(
   province = "province",      # 1 = Sofala, 2 = Manica
   urban = "urbanorrural"      # 1 = urban, 2 = rural
 )
 # TO DO: merge these onto the individual-level data
+
+
+tmp <- df_in %>%
+  filter(!is.na(province))
+
+gmodels::CrossTable(tmp$province, tmp$urbanorrural)
+
+
+tmp2 <- tmp %>%
+  group_by(urbanorrural) %>%
+  summarize(count = n()) %>%
+  mutate(pct = count / sum(count))
 
 
 vars <- c(
@@ -46,8 +111,44 @@ vars <- c(
   cat1_mother1549 = "category___1",
   cat2_legal = "category___2",
   cat3_mother_50plus = "category___3",
-  cat4_men_15plus = "category___4"
+  cat4_men_15plus = "category___4",
+  where_first_treatment = "select329",
+  fever_treatment_took = "select330",
+  # fever_treatment_type = "select331",  # this contains information about other diseases
+                                         # we should re-code to include only diseases we want
+  
+  # fever variables
+  fever1 ="select328___1",   # *** # publico: unidade sanitaria
+  fever2 = "select328___2",  # *** # publico: brigrada movel    
+  fever3 = "select328___3",  # *** # publico: outro publico
+  fever4 = "select328___4",  # *** # privado: clinica
+  fever5 = "select328___5",  # --- # privado: farmacia  # this one is ambiguous; maybe didn't see a doctor
+  fever6 = "select328___6",  #       privado: medico
+  fever7 = "select328___7",  # *** # privado: outro
+  fever8 = "select328___8",  #       outro: mercado
+  fever9 = "select328___9",  #       outro: medicina tradicional
+  fever10 = "select328___10", # --- # outro: pessoal de saude do bairro # this one is ambiguous; remove
+  fever11 = "select328___11", # --- # outro: outro
+  
+  # *** means 'went to a health facility'
+  # --- means remove because it's ambiguous whether going here is good
+  
+  # 'select309' is where got treatment for diarrhea
+  d1 = "select309___1",   # public: unidade sanitaria
+  d2 = "select309___2",   # public: brigada movel
+  d3 = "select309___3",   # public: outro publico
+  d4 = "select309___4",   # private: clinica
+  d5 = "select309___5",   # private: farmacia
+  d6 = "select309___6",   # private: medico
+  d7 ="select309___7",   # private: outro
+  d8 = "select309___8",   # other: mercado
+  d9 = "select309___9",   # other: traditional healer
+  d10 = "select309___10",  # other: 'pessoal de saude do bairro'
+  d11 = "select309___11"  # other: other
+  
 )
+
+
 
 
 df1 <- df_in %>%
@@ -61,7 +162,40 @@ df1 <- df_in %>%
   mutate(
     mom_18plus = NA,
     mom_18plus = ifelse(age >= 18, 1, mom_18plus),
-    mom_18plus = ifelse(age < 18, 0, mom_18plus) )
+    mom_18plus = ifelse(age < 18, 0, mom_18plus),
+    age = ifelse(age > 80 | age < 10, NA, age),
+    diarrhea_2wk_bin = NA,
+    diarrhea_2wk_bin = ifelse(diarrhea_2wk == 1, 1, diarrhea_2wk_bin),
+    diarrhea_2wk_bin = ifelse(diarrhea_2wk == 2, 0, diarrhea_2wk_bin),
+    fever_2wk_bin = NA,
+    fever_2wk_bin = ifelse(fever_2wk == 1, 1, fever_2wk_bin),
+    fever_2wk_bin = ifelse(fever_2wk == 2, 0, fever_2wk_bin)
+  )
+
+
+
+
+fit1 <- glm(diarrhea_2wk_bin ~ age, data = df1, family = "binomial")
+summary(fit1)
+exp(coef(fit1))
+confint(fit1)
+
+names(df1)
+
+fit2<- glm(fever_2wk_bin ~ age, data = df1, family = "binomial")
+summary(fit2)
+exp(coef(fit2))
+confint(fit2)
+exp(coef(fit2))
+
+
+df1$catvar <- sample(c("a", "b", "c", "d"), size = nrow(df1), replace = TRUE)
+df1$catvar2 <- factor(df1$catvar, levels = c("a", "b", "c", "d"))
+
+fit3 <- glm(diarrhea_2wk_bin ~ age + catvar2, data = df1, family = "binomial")
+summary(fit3)
+
+
 
 
 table(df1$mom_18plus)

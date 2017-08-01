@@ -17,7 +17,6 @@ library("foreign")
 
 dir <- "C:/Users/rsoren/Documents/CIOB analyses/"
 
-
 df_in <- RODBC::odbcConnectAccess2007(paste0(dir, "peer/DB PEER_6-May-17.accdb"))
 tables <- RODBC::sqlTables(df_in)
 

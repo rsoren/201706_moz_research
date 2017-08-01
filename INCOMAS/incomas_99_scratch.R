@@ -100,17 +100,19 @@ outcome_vars <- c(
   "select325",       # not so important
   "select326",       # not so important
   "select327",      # yes, is important
-  "select328___1",
-  "select328___2",
-  "select328___3",
-  "select328___4",
-  "select328___5",
-  "select328___6",
-  "select328___7",
-  "select328___8",
-  "select328___9",
-  "select328___10",
-  "select328___11",
+  
+  "select328___1",  # publico: unidade sanitaria
+  "select328___2",  # publico: brigrada movel
+  "select328___3",  # publico: outro publico
+  "select328___4",  # privado: clinica
+  "select328___5",  # privado: farmacia
+  "select328___6",  # privado: medico
+  "select328___7",  # privado: outro
+  "select328___8",  # outro: mercado
+  "select328___9",  # outro: medicina tradicional
+  "select328___10", # outro: pessoal de saude do bairro
+  "select328___11", # outro: outro
+  
   "select328_text",
   "select3281_text",
   "select329",

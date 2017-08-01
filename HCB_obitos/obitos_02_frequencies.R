@@ -147,6 +147,9 @@ write.csv(
   row.names = FALSE
 )
 
+"C:/Users/path/Analise R/graf_2cpp.jpg"
+
+dev.off()
 
 # percent with RxTorax among those with at least 1 sinais_pulmonar
 df5 <- df4 %>%
