@@ -197,7 +197,6 @@ results <- do.call("rbind", list(
   #   num_var = "numero_amostras_PCR_enviados_Lab",
   #   denom_var = "numero_cca_expost_HIV_1o_PCR" ),
   
-  # new analysis
   get_output(
     paste0(
       "Among children that began CCR - ",
@@ -231,16 +230,17 @@ results <- do.call("rbind", list(
       "Among children enrolled in CCR - ", 
       "how many got the PCR test within 8 weeks" ), 
     num_var = "numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida",
-    denom_var = "numero_cca_expost_HIV_1o_PCR" )
+    denom_var = "numero_cca_expost_HIV_1o_PCR" ),
   
   # -- negative numbers problem
-  # get_output( # check on this; within 16 weeks, or between 8 and 16 weeks
-  #   paste0(
-  #     "Among the children that got a PCR test - ",
-  #     "how many receive the test result within 4 months" ),
-  #   num_var = "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
-  #   denom_var = "numero_PCR_entregue"
-  # )
+  get_output( # check on this; within 16 weeks, or between 8 and 16 weeks
+    paste0(
+      "Among the children that got a PCR test - ",
+      "how many receive the test result within 4 months" ),
+    num_var = "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
+    # denom_var = "numero_PCR_entregue"
+    denom_var = "numero_PCR_recebidosdolab_ref"
+  )
   # 
   # tmp <- df[, c("US", "coorte", "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
   #   "numero_PCR_entregue")]

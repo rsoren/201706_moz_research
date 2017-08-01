@@ -7,3 +7,4 @@ Among PCR tests that went to the laboratory - how many test results came back to
 Among tests that came back to the health facility - how many came within 28 days,0.16,0.1,0.28,0.375,0.624,numero_PCR_recebido_ate_28dias,numero_PCR_recebidosdolab_ref
 Among samples returned to the health facility - how many were received by the patient,2.3,1.36,3.87,0.067,0.082,numero_PCR_entregue,numero_PCR_recebidosdolab_ref
 Among children enrolled in CCR - how many got the PCR test within 8 weeks,0.79,0.53,1.2,0.868,0.871,numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida,numero_cca_expost_HIV_1o_PCR
+Among the children that got a PCR test - how many receive the test result within 4 months,2.42,1.53,3.82,0.337,0.77,numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida,numero_PCR_recebidosdolab_ref

@@ -14,6 +14,10 @@ rm(list = ls())
 df <- readRDS("_intermediate_files/DB_EID_v3.RDS")
 
 
+# distribution of dates of birth
+hist(df$DatadeNascimento_2, breaks = 30)
+
+
 # Describe the sociodemographic profile of children attending EID services and tested for HIV in Maputo city;
 
 # demographic variables: 
@@ -22,7 +26,8 @@ freq(df$Sexo, plot=F)
 
 
 # -- age: Calculate as date of collection (colheitaUS1) minus date of birth (Data de Nacimento)
-df$idade <- df$colheitaUS1_2 - df$DatadeNascimento_2
+df$idade <- as.numeric(df$colheitaUS1_2 - df$DatadeNascimento_2)
+hist(df$idade, breaks = 30)
 
 # 49 entries didn't have a date of birth
 with(df, crosstab(is.na(colheitaUS1_2), is.na(DatadeNascimento_2), plot=F))
@@ -97,57 +102,53 @@ df4 <- df3 %>%
     had_third_test = ifelse(is.na(third_test_result), 0, 1)
   )
 
-table(df4$first_test_result, df4$second_test_result, useNA = "always")
+table(df4$first_test_result, df4$second_test_result, exclude = NULL)
 with(df4, freq(is_discordant, plot=F))
 with(subset(df4, is_discordant == 1), freq(had_third_test, plot=F))
 
 
 # Determine the proportion of children with the appropriate management
 #   through the age of 18 months (as per the algorithm) who had a positive result;
-#
+# 
 # -- Make the time window smaller, try 9 months and 3 months
 # -- Decide which threshold to use based on the remaining sample size
-#
+# 
 
 
 
-
-# Identify the factors relating to the non-compliance with the algorithm for EID for PCR DNA HIV first positive test.
+# Identify the factors relating to the non-compliance with the 
+#   algorithm for EID for PCR DNA HIV first positive test.
 # -- Logistic regression
 
 # What are the factors we want to use to predict non-compliance?
-# -- Still waiting on data about maternal age and site of delivery
+# -- Waiting on data about maternal age and site of delivery
 # -- Child age at enrollment in CCR
 # -- Time it takes for the laboratory to get a result back to the health facility
 
+# Measures of non-compliance
 # -- Whether or not mother comes to take the result
 # -- Missed appointment
 
 
-# Exclude children for whom we don't have 3 months of data, starting from date of first collection
-# 
+# Hypothesis: Child age at enrollment influences 
+#   whether the mother comes to take the result
 
-# How does child age at enrollment influence:
-# -- Maternal age
-# -- Site of delivery
-# -- Turn around time
-# -- Whether the mother comes to take the result
 
-# Does taking the second test means that 
+# Hypothesis: Does taking the second test means that 
 # people are more likely to be on TARV
 
-# Lab staff said there were no problems
+# Lab staff said there was no problem
 #   with PCR machine breaking during the study period
+
 
 # Among people with discordant results for the 
 # first two tests, what factors influence 
 # whether they got a third test? 
+# -- Not enough data to answer this (n=23, with 2 people getting third test)
 
 # factors --> non-compliance
 
-# can't use the word in the definition (dictionary)
-
-# taking more time for the result to return to the health facility
+# hypothesis: taking more time for the result to return to the health facility
 # --> non-compliance
 
 # statistically, logistic regression with a categorical predictor is the same as a chi-square test
@@ -165,62 +166,8 @@ with(subset(df4, is_discordant == 1), freq(had_third_test, plot=F))
 # 10 = sem ficha de no proceso TARV
 # 11 = dados nao conferem (not the same)
 
+# Exclude children for whom we don't have 3 months of data, starting from date of first collection
+# -- Later, not urgent
 
 
 
-# RESULTADO LAB 2 -- result of second test
-# 0 = negative
-# 1 = positive
-# 2 = indeterminate
-
-library(gmodels)
-CrossTable(
-  x = factor(dat$Resultado_Lab_1_v2), 
-  y = factor(dat$Resultado_Lab_2_v2)
-)
-
-
-# Among children with a positive first PCR test, 
-#   proportion that had a second test
-
-# Denominator: RESULTADO LAB 1
-
-# if laboratory result is missing, use the result from the 
-# health facility (if it exists)
-# 
-
-#  # . ( ) [space] / ,
-
-names(dat) <- gsub(
-  pattern = "[^a-zA-Z0-9]",
-  replacement = "",
-  x = names(dat)
-)
-
-write.csv(
-  x = dat,
-  file = "_intermediate_files/DB_EID_25012017_v2.csv",
-  row.names = FALSE
-)
-
-
-
-
-
-
-
-
-
-# denominator = all children with HIV 
-              = 
-# numerator = number of children who had two tests
-
-
-
-
-CrossTable(dat$Resultado_LAB_1)
-CrossTable(dat$Resultado_LAB_2)
-CrossTable(dat$Resultado_LAB_1, dat$Resultado_LAB_2)
-
-table(dat$`Resultado LAB 1`)
-table(dat$Resultado_LAB_2)
