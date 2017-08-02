@@ -239,12 +239,10 @@ results <- do.call("rbind", list(
       "how many receive the test result within 4 months" ),
     num_var = "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
     # denom_var = "numero_PCR_entregue"
-    denom_var = "numero_PCR_recebidosdolab_ref"
-  )
+    denom_var = "numero_PCR_recebidosdolab_ref" )
   # 
   # tmp <- df[, c("US", "coorte", "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
   #   "numero_PCR_entregue")]
-  
   
   # # still need to resolve these
   # Among children in CCR, 

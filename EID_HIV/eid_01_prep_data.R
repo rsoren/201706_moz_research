@@ -68,9 +68,10 @@ fix_date <- function(j, switch_monthday = TRUE) {
 # -- Row 1 should be July 5, 2014 (switch day/month from original)
 # -- Row 2 should be June 26, 2014 (unchanged for original)
 
-df[, "dob"] <- fix_date("DatadeNascimento")
-# df[, "dob"] <- fix_date("DatadeNascimento", switch_monthday = FALSE)
-tmp <- df[, c("DatadeNascimento", "dob")]
+tmp <- subset(df, select = "DatadeNascimento")
+
+# tmp[, "dob"] <- fix_date("DatadeNascimento")
+tmp[, "dob"] <- fix_date("DatadeNascimento", switch_monthday = FALSE)
 
 
 # Convert all funky dates to common format
