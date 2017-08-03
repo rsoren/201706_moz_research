@@ -488,19 +488,7 @@ disease_list <- list(
     "Diareia aguda com desidratacao",
     "Diareia cronica", #-- disease
     "Diarreia aguda",
-    "Diarreia cronica" ),
-  encefalopatia_not_due_to_HIV = c( # d
-    "ENcefalite",
-    "Encefalite aguda",
-    "Encefalopatia",
-    "Encefalopatia hepatica",
-    "Encefalopatia uremica" ),
-  encefalopatia_due_to_HIV = c( # d
-    "Encefalite por HIV",
-    "Encefalite tipo HIV",
-    "Encefalopatia por HIV",
-    "ENcefalopatia por HIV" ),
-  gastroenterite = c( # d
+    "Diarreia cronica",
     "Gastroenterite aguda",
     "Gastroenterite aguda com desidratacao grave",
     "Gastroenterite agudo",
@@ -512,6 +500,17 @@ disease_list <- list(
     "GEA com desidratacao moderada",
     "GEA com desidratacao severa",
     "Desenteria" ),
+  encefalopatia_not_due_to_HIV = c( # d
+    "Encefalopatia hepatica",
+    "Encefalopatia uremica" ),
+  encefalopatia_due_to_HIV = c( # d
+    "ENcefalite",
+    "Encefalite aguda",
+    "Encefalopatia",
+    "Encefalite por HIV",
+    "Encefalite tipo HIV",
+    "Encefalopatia por HIV",
+    "ENcefalopatia por HIV" ),
   hemorragia_gastrica = c(
     "Hemoragia gastrica",
     "Hemorrragia digestiva alta" ),
@@ -649,7 +648,7 @@ disease_list <- list(
   trombocitopenia = c(
     "Trombocitopenia",
     "Trombocitopenia grave" ),
-  tumors = c(
+  other_tumors = c(
     "Cancer de figado",
     "Carcinoma hepatocelular",
     "Tumor abdominal",
@@ -688,6 +687,15 @@ disease_list <- list(
 
 diseases_categorized <- as.vector(do.call("c", disease_list))
 diseases_uncategorized <- diseases[!(diseases %in% diseases_categorized)]
+
+# opportunistic infections
+
+# TODO: make a new dichotomous variable indicating whether
+#       the patient had an opportunistic infection at admission
+opportunistic_infections <- c(
+  "broncopneumonia", "candiase", "diareia", "encefalopatia_due_to_HIV",
+  "malaria", "meningocefalite", "pcp", "sepsis", "tb"
+)
 
 
 # create a new dichotomous variable for each symptom group
