@@ -145,6 +145,7 @@ asset indicators into a single number while retaining as much information as pos
 - Household predictors: urbanicity, 
   categorical vehicle variable (see below), SES index
 - Other: Offset is number of adults in the household  
+</br>
 Vehicle variable:
 - 1. No car or motorcycle (reference group)
 - 2. Motorcycle only
