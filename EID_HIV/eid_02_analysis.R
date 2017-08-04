@@ -191,7 +191,7 @@ df6 <- df5 %>%
     total = n()) %>%
   mutate(proportion = count / total)
 
-
+print(df6)
 
 
 # Identify the factors relating to the non-compliance with the 
@@ -282,14 +282,14 @@ with(subset(df5, is.na(DatadeiniciodoTARV_2)),
 
 
 # save as R Markdown document
-# library("rmarkdown")
-# setwd(paste0(dir, "EID_HIV/"))
-# 
-# rmarkdown::render(
-#   input = "eid_02_analysis.R",
-#   output_format = "pdf_document"
-# )
-# 
-# setwd(dir)
+library("rmarkdown")
+setwd(paste0(dir, "EID_HIV/"))
+
+rmarkdown::render(
+  input = "eid_02_analysis.R",
+  output_format = "pdf_document"
+)
+
+setwd(dir)
 
 

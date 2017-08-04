@@ -132,7 +132,6 @@ other_var_list <- c(
   "freq_resp_cat",
   "tensao_systolic_cat",
   "tensao_diastolic_cat",
-  "had_TB",
   "age_cat",
   "Sexo"
 )

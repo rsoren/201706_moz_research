@@ -13,8 +13,12 @@ library(gmodels)
 df_in <- fread("_data/INCOMAS_DATA_2017-07-24_0836.csv") %>%
   as.data.frame(.)
 
-df_in <- read.csv("_data/INCOMAS_DATA_2017-07-24_0836.csv")
+check_var <- function(x, dat = df_in) {
+  names(dat)[grepl(x, names(dat), ignore.case = TRUE)]
+}
 
+tmp <- df_in[, check_var("inj")] %>%
+  filter(injure131 > 0)
 
 
 
