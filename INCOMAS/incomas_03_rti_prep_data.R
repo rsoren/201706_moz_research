@@ -162,10 +162,12 @@ lapply(df[, vars1], function(x) {
 #' - Household predictors: urbanicity, having a car, having a motorcycle,
 #'             SES index
 #' - Other: Offset is number of people in the household
-#' - The variable 'ses\_index' uses all asset variables except car and motorcycle, 
+#' - 'ses\_index' uses all asset indicators except car and motorcycle 
+#' (i.e. electricity, radio, tv, mobile phone, phone landline, refrigerator, 
+#' watch, bicycle, cart and motorboat), 
 #' because those are used as independent variables in the model. It is calculated
-#' with _multiple correspondence analysis_. The method collapses all of the dichotomous 
-#' variables into a single number while retaining as much information as possible.
+#' with _multiple correspondence analysis_. The method collapses all of the 
+#' asset indicators into a single number while retaining as much information as possible.
 #' 
 
 #+ echo=FALSE
