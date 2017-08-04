@@ -10,14 +10,12 @@
 save_as_markdown <- function(relative_path) {
   
   require(knitr)
-  require(rmarkdown)
   
   wd_sav <- paste0(getwd(), '/')
   
   try({
     setwd(dirname(paste0(wd_sav, relative_path)))
-    # knitr::spin(paste0(wd_sav, relative_path))
-    rmarkdown::render(paste0(wd_sav, relative_path))
+    knitr::spin(paste0(wd_sav, relative_path))
   })
   
   setwd(wd_sav)
