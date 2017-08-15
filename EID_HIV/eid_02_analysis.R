@@ -236,8 +236,8 @@ write.csv(results_by_prov, paste0(dir, "EID_HIV/results_by_prov.csv"))
 crosstab(df5$c8, df5$test_within_6wk, plot=F)
 # - how many started TARV
 crosstab(df5$c8, df5$started_tarv, plot=F)
-# - how many mothers comes to take the first result # what's the variable for this?
-# - how many have turn-around time before 30 days # what's the variable for this?
+# - how many mothers comes to take the first result
+# - how many have turn-around time before 30 days
 
 
 
