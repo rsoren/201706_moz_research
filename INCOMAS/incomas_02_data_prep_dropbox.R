@@ -14,7 +14,15 @@ library(readstata13)
 df <- readstata13::read.dta13("_data/INCOMAS Child and mother long.dta")
 df2 <- readstata13::read.dta13("_data/INCOMAS Household and injury only 2017-06-08.dta")
 
-names(df)[grepl("cat", names(df))]
+df2_mergevars <- df2[, c("odkuri", "province", "urbanorrural")]
+
+df_new <- df %>%
+  select(-province, -urbanorrural) %>% # get rid of variables with same name, but missing info
+  left_join(df2_mergevars, by = "odkuri")
+
+# check whether merge worked
+table(df_new$province, exclude = FALSE)
+table(df_new$urbanorrural, exclude = FALSE)
 
 
 # individual-level data

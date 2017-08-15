@@ -260,6 +260,7 @@ dat_pred3$phat <- predict(fit3,
 #' - Other: Offset is number of adults in the household  
 
 #' </br>
+#'   
 
 #' Vehicle variable:
 #' - 1. No car or motorcycle (reference group)

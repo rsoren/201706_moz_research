@@ -29,7 +29,16 @@ freq(df$Sexo, plot=F)
 # -- age: Calculate as date of collection (colheitaUS1) minus date of birth (Data de Nacimento)
 df$idade <- as.numeric(df$colheitaUS1_2 - df$DatadeNascimento_2)
 hist(df$idade, breaks = 30)
+
 # -- Above and below 6 weeks
+
+# distribution of age at collection, by age group
+# 0-6 weeks; 7-12 weeks; 13-18 weeks; 19-24 weeks; 25-30 weeks; 31-36 weeks; 37 + 
+# Note: I changed the cutoffs slightly, so the first number increases by 6 each time
+
+df$idade_semana <- df$idade / 7
+df$idade_semana_grupo <- cut(df$idade_semana, breaks = c(0,6,12,18,24,30,36,999), right = FALSE)
+freq(df$idade_semana_grupo, plot=F)
 
 
 # 49 entries didn't have a date of birth
@@ -113,9 +122,6 @@ with(subset(df4, is_discordant == 1), freq(had_third_test, plot=F))
 # Determine the proportion of children with the appropriate management
 #   through the age of 18 months (as per the algorithm) who had a positive result;
 # 
-# -- Make the time window smaller, try 9 months and 3 months
-# -- Decide which threshold to use based on the remaining sample size
-# 
 # Definition of appropriate management:
 # 1. Positive PCR DNA test at 4-6 weeks
 # 2. ART initiation [variable for this?] # DatadeiniciodoTARV
@@ -173,20 +179,77 @@ df5 <- df4 %>%
 
     # among people on ART who took second test and it was negative,
     # non-compliant if they didn't take a third test
-    c8 = ifelse(is.na(c7) & had_third_test == 0, 1, c7)
-
+    c8 = ifelse(is.na(c7) & had_third_test == 0, 1, c7)  ) %>%
+  mutate(
+    started_tarv = ifelse(is.na(DatadeiniciodoTARV_2), 0, 1),
+    ProvUS_factor = factor(ProvUS)
   )
+  
 
+
+#-- check coding for appropriate management variable
 # lapply(paste0("c", 1:7), function(x) print(table(df5[, x])))
 
-# overall frequency of following protocol
+
+# get results for selected variables by proveniencia 
+
+results_by_prov <- df5 %>%
+  group_by(Proveniencia) %>%
+  dplyr::summarize(
+    appropriate_management = sum(c8, na.rm=T),
+    started_tarv = sum(started_tarv, na.rm=T),
+    median_age_days = median(idade, na.rm=T),
+    first_test_positive = sum(first_test_result == 1, na.rm=T),
+    first_test_negative = sum(first_test_result == 0, na.rm=T),
+    had_second_test = sum(had_second_test, na.rm=T),
+    second_test_positive = sum(second_test_result == 1, na.rm=T),
+    second_test_negative = sum(second_test_result == 0, na.rm=T),
+    had_third_test = sum(had_third_test, na.rm=T),
+    third_test_positive = sum(third_test_result == 1, na.rm=T),
+    third_test_negative = sum(third_test_result == 0, na.rm=T),
+    facility_receive_1 = sum(!is.na(DataderecepcaonaCCR1), na.rm=T),
+    facility_receive_2 = sum(!is.na(DataderecepcaonaCCR2), na.rm=T),
+    facility_receive_3 = sum(!is.na(DataderecepcaonaCCR3), na.rm=T),
+    # not sure if these 'mother_receive' variables measure the same thing,
+    #   but there's no alternative
+    # Note that only 1 and 3 have "oucuidador" in the variable name
+    mother_receive_1 = sum(!is.na(Datadeentregaamaeoucuidador1_2), na.rm=T),
+    mother_receive_2 = sum(!is.na(Datadeentregaamae2_2), na.rm=T),
+    mother_receive_3 = sum(!is.na(Datadeentregaamaeoucuidador3_2), na.rm=T),
+    total = n() )
+
+
+pct_names <- names(results_by_prov)[!names(results_by_prov) %in% c("Proveniencia", "total")]
+
+for (nm in pct_names) {
+  results_by_prov[, paste0("pct_", nm)] <- 
+    results_by_prov[, nm] / results_by_prov$total
+}
+
+write.csv(results_by_prov, paste0(dir, "EID_HIV/results_by_prov.csv"))
+
+#####
+# Bivariate analysis, comparing how many children had appropriate management, versus:
+# - how many children had test within 6 weeks
+crosstab(df5$c8, df5$test_within_6wk, plot=F)
+# - how many started TARV
+crosstab(df5$c8, df5$started_tarv, plot=F)
+# - how many mothers comes to take the first result # what's the variable for this?
+# - how many have turn-around time before 30 days # what's the variable for this?
+
+
+
+
+
+
+# overall frequency of following protocol ('appropriate management')
 freq(df5$c8, plot=F)
 
 
 # split by provenance (health facility)
 df6 <- df5 %>%
   group_by(Proveniencia) %>%
-  summarize(
+  dplyr::summarize(
     count = sum(c8),
     total = n()) %>%
   mutate(proportion = count / total)
@@ -209,16 +272,44 @@ print(df6)
 # is age at child's first test associated with with whether they started TARV?
 
 dat_fit1 <- df5 %>%
-  filter(is.na(c3)) %>%
-  mutate(started_tarv = ifelse(is.na(DatadeiniciodoTARV_2), 0, 1) )
+  filter(is.na(c3))
 
 fit1 <- glm(
-  formula = started_tarv ~ idade, 
+  formula = started_tarv ~ idade,
   data = dat_fit1,
   family = binomial(link = "logit")
 )
 
 summary(fit1)
+
+# check for evidence of clustering
+# rho=0 means no clustering; rho=1 means complete clustering
+
+library("Hmisc")
+deff(as.logical(dat_fit1$started_tarv), cluster = dat_fit1$Proveniencia)
+
+
+# random effects model that accounts for clustering
+library(lme4)
+
+dat_fit1_re <- dat_fit1 %>%
+  # have to drop facilities with low numbers, otherwise this model doesn't converge
+  group_by(Proveniencia) %>%
+  filter(n() >= 10) %>% # keep only facilities with n >= 10; lowest number that still converges
+  as.data.frame(.) %>%
+  mutate(Proveniencia = droplevels(Proveniencia))
+
+table(dat_fit1_re$Proveniencia)
+
+fit1_re <- glmer(
+  formula = started_tarv ~ idade + (1 | Proveniencia),
+  data = dat_fit1_re,
+  family = binomial(link = "logit")
+)
+
+summary(fit1_re)
+
+ranef1 <- ranef(fit1_re)[[1]][,1]
 
 
 # Among people who took test within 6 weeks and 
@@ -226,6 +317,11 @@ summary(fit1)
 # is age at child's first test associated with with whether they had second test?
 
 dat_fit2 <- subset(df5, is.na(c4))
+
+# check for evidence of clustering in having a second test (negative rho; no clustering)
+deff(as.logical(dat_fit2$had_second_test), cluster = dat_fit2$Proveniencia)
+
+table(dat_fit2$Proveniencia)
 
 fit2 <- glm(
   formula = had_second_test ~ idade, 
@@ -236,23 +332,108 @@ fit2 <- glm(
 summary(fit2)
 
 
-# Measures of non-compliance
-# [what are the variables for these?]
-# -- Whether or not mother comes to take the result
-# -- Missed appointment
+# Data for turnaround time analyses
+
+dat_fit3 <- df5 %>%
+  mutate(
+    turnaround_time_1 = as.numeric(processamento1_2 - colheitaUS1_2),
+    turnaround_time_2 = as.numeric(processamento2_2 - colheitaUS2_2),
+    tt_30 = turnaround_time_1 >= 30,
+    tt_30_2 = turnaround_time_2 >= 30
+  )
+
+# check for clustering in turnaround time (not enough to need accounting for it)
+table(dat_fit3$Proveniencia)
+deff(dat_fit3$turnaround_time_1, cluster = dat_fit3$Proveniencia)
+deff(dat_fit3$turnaround_time_2, cluster = dat_fit3$Proveniencia)
+
+# Among people who had a FIRST sample taken, 
+# what is the effect of faster turnaround time ('processamento1_2' minus 'colheitaUS1_2')
+
+# check for clustering in appropriate management (rho=0.0051)
+deff(as.logical(dat_fit3$c8), cluster = dat_fit3$Proveniencia)
+
+# outcome: appropriate management
+# -- predictor: turnaround time at least 30 days for first test
+fit3 <- glm(
+  formula = c8 ~ tt_30,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+
+summary(fit3)
+
+# -- predictor: turnaround time (continuous) for first test
+
+fit4 <- glm(
+  formula = c8 ~ turnaround_time_1,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+summary(fit4)
 
 
-# Hypothesis: Child age at enrollment influences 
-#   whether the mother comes to take the result
+# outcome: started TARV
+# -- predictor: turnaround time at least 30 days
+
+fit5 <- glm(
+  formula = started_tarv ~ tt_30,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+
+summary(fit5)
+
+# -- predictor: turnaround time (continuous)
+
+fit6 <- glm(
+  formula = started_tarv ~ turnaround_time_1,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+
+summary(fit6)
+
+
+# outcome: appropriate management
+# -- predictor: turnaround time at least 30 days for second test
+fit7 <- glm(
+  formula = c8 ~ tt_30_2,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+
+summary(fit7)
+
+# -- predictor: turnaround time (continuous) for second test
+
+fit8 <- glm(
+  formula = c8 ~ turnaround_time_2,
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+summary(fit8)
+
+# interesting that dichotomous <>30 days is significant, but 
+#   a continuous measure of time is not
+# -- checking a 'generalized additive model' (GAM) to visualize 
+#    the non-linear effect of turnaround time 
+
+library(mgcv)
+fit8_gam <- gam(
+  formula = c8 ~ s(turnaround_time_2),
+  data = dat_fit3,
+  family = binomial(link = "logit")
+)
+
+summary(fit8_gam)
+plot(fit8_gam)
 
 
 # Among people with discordant results for the 
 # first two tests, what factors influence 
 # whether they got a third test? 
 # -- Not enough data to answer this (n=23, with 2 people getting third test)
-
-# hypothesis: taking more time for the result to return to the health facility
-# --> non-compliance [what kind; what variable?]
 
 
 # Motive de nao TARV
@@ -271,6 +452,9 @@ summary(fit2)
 # Report as: This number of children don't start TARV
 #            If not start TARV, frequency giving each reason
 
+with(subset(df5, started_tarv != 1), freq(MotivodenaoTARV, plot=F))
+
+
 # FALSE = did not start TARV
 # TRUE = started TARV
 table(!is.na(df5$DatadeiniciodoTARV_2))
@@ -282,14 +466,14 @@ with(subset(df5, is.na(DatadeiniciodoTARV_2)),
 
 
 # save as R Markdown document
-library("rmarkdown")
-setwd(paste0(dir, "EID_HIV/"))
-
-rmarkdown::render(
-  input = "eid_02_analysis.R",
-  output_format = "pdf_document"
-)
-
-setwd(dir)
+# library("rmarkdown")
+# setwd(paste0(dir, "EID_HIV/"))
+# 
+# rmarkdown::render(
+#   input = "eid_02_analysis.R",
+#   output_format = "pdf_document"
+# )
+# 
+# setwd(dir)
 
 

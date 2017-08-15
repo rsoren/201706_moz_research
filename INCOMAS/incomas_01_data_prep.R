@@ -20,6 +20,40 @@ check_var <- function(x, dat = df_in) {
 tmp <- df_in[, check_var("inj")] %>%
   filter(injure131 > 0)
 
+varnames <- names(df_in)[grepl("select309", names(df_in))]
+tmp <- df_in[, varnames]
+
+incomas3 <- df_in
+
+incomas4 <- incomas3 %>%
+  mutate(
+    newvar = (select309___1 + select309___2 + select309___3) > 0,
+    newvar2 = 10,
+    newvar3 = newvar2 + 5
+  )
+
+table(incomas4$newvar)
+
+table(incomas4$select306)
+
+incomas5 <- incomas4 %>%
+  mutate(
+    newvar = NA,
+    newvar = ifelse(select306 == 1, 1, newvar),
+    newvar = ifelse(select306 == 2, 0, newvar)
+  )
+
+
+table(incomas5$newvar)
+
+
+fit1 <- glm(newvar ~ age1_integer, family = "binomial", data = incomas5)
+summary(fit1)
+
+my_coefs <- coef(fit1)
+my_confints <- confint(fit1)
+my_results <- cbind(my_coefs, my_confints)
+my_odds_ratios <- exp(my_results)
 
 
 # first part, household survey
