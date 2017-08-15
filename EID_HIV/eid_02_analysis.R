@@ -186,6 +186,8 @@ df5 <- df4 %>%
   )
   
 
+# write.csv(df5, paste0(dir, "EID_HIV/eid_hiv_processed_data.csv"), row.names = FALSE)
+
 
 #-- check coding for appropriate management variable
 # lapply(paste0("c", 1:7), function(x) print(table(df5[, x])))
@@ -318,7 +320,7 @@ ranef1 <- ranef(fit1_re)[[1]][,1]
 
 dat_fit2 <- subset(df5, is.na(c4))
 
-# check for evidence of clustering in having a second test (negative rho; no clustering)
+# check for evidence of clustering in having a second test (no clustering)
 deff(as.logical(dat_fit2$had_second_test), cluster = dat_fit2$Proveniencia)
 
 table(dat_fit2$Proveniencia)
