@@ -139,9 +139,20 @@ with(subset(df4, is_discordant == 1), freq(had_third_test, plot=F))
 # is_discordant
 # had_third_test
 # third_test_positive
-
+    
 # see "testing_cascade_logic.docs" for a visual representation
 #   of the Boolean logic
+
+df4_tmp <- df4 %>%
+  mutate(exclude_if_false = first_test_positive == 0 & had_second_test == 0 & had_third_test == 0) %>%
+  select(Proveniencia, ResultadoLAB1, ResultadoUS1, first_test_positive, 
+    had_second_test, had_third_test, exclude_if_false)
+
+with(df4_tmp, table(exclude_if_false, exclude = ""))
+
+write.csv(df4_tmp, paste0(dir, "EID_HIV/check_exclusions.csv", row.names = FALSE))
+
+  # filter(first_test_positive == 0 & had_second_test == 0 & had_third_test == 0)
 
 df5 <- df4 %>%
   # remove children with negative first test, then no 2nd or 3rd test
@@ -179,10 +190,14 @@ df5 <- df4 %>%
 
     # among people on ART who took second test and it was negative,
     # non-compliant if they didn't take a third test
-    c8 = ifelse(is.na(c7) & had_third_test == 0, 1, c7)  ) %>%
+    c8 = ifelse(is.na(c7) & had_third_test == 0, 1, c7) ) %>%
   mutate(
     started_tarv = ifelse(is.na(DatadeiniciodoTARV_2), 0, 1),
-    ProvUS_factor = factor(ProvUS)
+    ProvUS_factor = factor(ProvUS),
+    turnaround_time_1 = as.numeric(processamento1_2 - colheitaUS1_2),
+    turnaround_time_2 = as.numeric(processamento2_2 - colheitaUS2_2),
+    tt_30 = turnaround_time_1 >= 30,
+    tt_30_2 = turnaround_time_2 >= 30
   )
   
 
@@ -233,15 +248,13 @@ write.csv(results_by_prov, paste0(dir, "EID_HIV/results_by_prov.csv"))
 #####
 # Bivariate analysis, comparing how many children had appropriate management, versus:
 # - how many children had test within 6 weeks
-crosstab(df5$c8, df5$test_within_6wk, plot=F)
+crosstab(df5$c8, df5$test_within_6wk, plot=F, chisq = TRUE)
 # - how many started TARV
-crosstab(df5$c8, df5$started_tarv, plot=F)
+crosstab(df5$c8, df5$started_tarv, plot=F, chisq = TRUE)
 # - how many mothers comes to take the first result
+crosstab(df5$c8, is.na(df5$Datadeentregaamaeoucuidador1), plot=F, chisq = TRUE)
 # - how many have turn-around time before 30 days, for each test
-
-
-
-
+crosstab(df5$c8, df5$tt_30, plot=F, chisq = TRUE)
 
 
 # overall frequency of following protocol ('appropriate management')
@@ -254,9 +267,8 @@ df6 <- df5 %>%
   dplyr::summarize(
     count = sum(c8),
     total = n()) %>%
-  mutate(proportion = count / total)
-
-# TODO: convert to data frame, so displays all provenance
+  mutate(proportion = count / total) %>%
+  as.data.frame(.)
 
 print(df6)
 
@@ -271,7 +283,31 @@ print(df6)
 # -- Time it takes for the laboratory to get a result back to the health facility
 
 
-# TODO: report odds ratio with confidence interval as well
+# function for getting odds ratio and CI from regression results
+
+get_ci <- function(model, variable, exponentiate = FALSE) {
+  
+  # model <- fit1; variable <- "idade"; exponentiate = TRUE # dev variables
+  
+  txt <- paste0("Beta coefficient of '", variable, "': ")
+  
+  output <- list(
+    tmp_point <- coef(model)[variable],
+    tmp_confint <- confint(model)[variable,]
+  )
+  
+  if (exponentiate) {
+    txt <- paste0("Exponentiated '", variable, "': ")
+    output <- lapply(output, exp)
+  }
+  
+  output <- lapply(output, function(x) round(x, digits = 3))
+  cat("\n", paste0(
+    txt, output[[1]], " (95% CI: ", paste0(output[[2]], collapse = ", "), ")"
+  ))
+  
+}
+
 
 # Among people who took test within 6 weeks and 
 #   had positive first test [designated as is.na(c3)],
@@ -287,6 +323,8 @@ fit1 <- glm(
 )
 
 summary(fit1)
+get_ci(model = fit1, variable = "idade", exponentiate = TRUE)
+
 
 # check for evidence of clustering
 # rho=0 means no clustering; rho=1 means complete clustering
@@ -336,17 +374,12 @@ fit2 <- glm(
 )
 
 summary(fit2)
+get_ci(model = fit2, variable = "idade", exponentiate = TRUE)
 
 
 # Data for turnaround time analyses
 
-dat_fit3 <- df5 %>%
-  mutate(
-    turnaround_time_1 = as.numeric(processamento1_2 - colheitaUS1_2),
-    turnaround_time_2 = as.numeric(processamento2_2 - colheitaUS2_2),
-    tt_30 = turnaround_time_1 >= 30,
-    tt_30_2 = turnaround_time_2 >= 30
-  )
+dat_fit3 <- df5
 
 # check for clustering in turnaround time (not enough to need accounting for it)
 table(dat_fit3$Proveniencia)
@@ -368,6 +401,7 @@ fit3 <- glm(
 )
 
 summary(fit3)
+get_ci(model = fit3, variable = "tt_30TRUE", exponentiate = TRUE)
 
 # -- predictor: turnaround time (continuous) for first test
 
@@ -377,6 +411,7 @@ fit4 <- glm(
   family = binomial(link = "logit")
 )
 summary(fit4)
+get_ci(model = fit4, variable = "turnaround_time_1", exponentiate = TRUE)
 
 
 # outcome: started TARV
@@ -389,6 +424,7 @@ fit5 <- glm(
 )
 
 summary(fit5)
+get_ci(model = fit5, variable = "tt_30TRUE", exponentiate = TRUE)
 
 # -- predictor: turnaround time (continuous)
 
@@ -399,6 +435,7 @@ fit6 <- glm(
 )
 
 summary(fit6)
+get_ci(model = fit6, variable = "turnaround_time_1", exponentiate = TRUE)
 
 
 # outcome: appropriate management
@@ -410,6 +447,7 @@ fit7 <- glm(
 )
 
 summary(fit7)
+get_ci(model = fit7, variable = "tt_30_2TRUE", exponentiate = TRUE)
 
 # -- predictor: turnaround time (continuous) for second test
 
@@ -419,6 +457,8 @@ fit8 <- glm(
   family = binomial(link = "logit")
 )
 summary(fit8)
+get_ci(model = fit8, variable = "turnaround_time_2", exponentiate = TRUE)
+
 
 # interesting that dichotomous <>30 days is significant, but 
 #   a continuous measure of time is not
