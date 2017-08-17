@@ -237,7 +237,7 @@ crosstab(df5$c8, df5$test_within_6wk, plot=F)
 # - how many started TARV
 crosstab(df5$c8, df5$started_tarv, plot=F)
 # - how many mothers comes to take the first result
-# - how many have turn-around time before 30 days
+# - how many have turn-around time before 30 days, for each test
 
 
 
@@ -256,6 +256,8 @@ df6 <- df5 %>%
     total = n()) %>%
   mutate(proportion = count / total)
 
+# TODO: convert to data frame, so displays all provenance
+
 print(df6)
 
 
@@ -268,6 +270,8 @@ print(df6)
 # -- Child age at enrollment in CCR (same thing as age at first collection)
 # -- Time it takes for the laboratory to get a result back to the health facility
 
+
+# TODO: report odds ratio with confidence interval as well
 
 # Among people who took test within 6 weeks and 
 #   had positive first test [designated as is.na(c3)],

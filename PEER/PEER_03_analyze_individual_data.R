@@ -313,10 +313,7 @@ get_ci(time_fit8, variable = "intervencao", exponentiate = TRUE)
 
 # logistic regression, whether or not did fourth pick-up
 fit1 <- glmer(
-  formula = lev2_dichot~intervencao + coorte + idade + (1|US),
-  # formula = lev4_dichot~intervencao + coorte + (1|US),
-  # formula = lev3_dichot~intervencao + idade + coorte + (1|US),
-  # formula = lev3_dichot~intervencao + coorte + (1|US),
+  formula = lev4_dichot~intervencao + idade + coorte + (1|US),
   # data = df,
   data = df2,
   family = binomial(link = "logit")
