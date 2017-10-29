@@ -8,9 +8,11 @@
 
 library(dplyr)
 library(lme4)
+library(lmerTest)
 library(lubridate)
 
 rm(list = ls())
+options(scipen = 999)
 
 # prep data
 
@@ -108,7 +110,7 @@ run_sw_analysis <- function(numerator, denominator) {
 
 get_result <- function(model, variable, exponentiate = FALSE) {
   
-  # model <- fit1; variable <- "coorte1a"; exponentiate = FALSE # dev variables
+  # model <- tmp_run$fit; variable <- "coorte1a"; exponentiate = FALSE # dev variables
   
   txt <- paste0("Beta coefficient of '", variable, "': ")
   
@@ -124,7 +126,10 @@ get_result <- function(model, variable, exponentiate = FALSE) {
   }
   
   output <- lapply(output, function(x) round(x, digits = 2))
-  c(output[[1]], output[[2]][1], output[[2]][2])
+  pval <- coef(summary(model))["intervencao",4]
+  
+  c(output[[1]], output[[2]][1], output[[2]][2], 
+    pval = round(pval, digits = 4) )
 }
 
 
@@ -147,7 +152,7 @@ get_output <- function(description, num_var, denom_var) {
     num_var, denom_var)
   
   names(out) <- c(
-    "description", "odds_ratio", "lower_ci", "upper_ci", 
+    "description", "odds_ratio", "lower_ci", "upper_ci", "p_value",
     "pct_control_unadjusted", "pct_intervencao_unadjusted",
     "numerator", "denominator")
   
@@ -232,15 +237,22 @@ results <- do.call("rbind", list(
     num_var = "numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida",
     denom_var = "numero_cca_expost_HIV_1o_PCR" ),
   
-  # -- negative numbers problem
-  get_output( # check on this; within 16 weeks, or between 8 and 16 weeks
+  get_output(
     paste0(
       "Among the children that got a PCR test - ",
       "how many receive the test result within 4 months" ),
     num_var = "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
-    # denom_var = "numero_PCR_entregue"
     denom_var = "numero_PCR_recebidosdolab_ref" )
+  
+  # # --negative numbers problem
+  # get_output( 
+  #   paste0(
+  #     "Among the children that got a PCR test - ",
+  #     "how many receive the test result within 2 months" ),
+  #   num_var = "numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida",
+  #   denom_var = "numero_PCR_recebidosdolab_ref" )
   # 
+  
   # tmp <- df[, c("US", "coorte", "numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida",
   #   "numero_PCR_entregue")]
   

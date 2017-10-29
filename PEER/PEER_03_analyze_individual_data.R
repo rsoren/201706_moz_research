@@ -4,6 +4,30 @@
 # Reed Sorensen
 # June 2017
 #
+# Create a variable for child's age at TARV initiation
+# and include it in the regression for same_day HIV meds
+#
+# Make sure we're doing the exclusions in 'df_subset'
+# -- Update the individual-level results summary after this
+#
+# Look up cost of publishing in Lancet and/or J-AIDS
+# -- Journal of Implementation Science and 'Human Resource'
+# -- Pediatric journals
+#
+# Paper for the formative phase (I won't necessarily be involved)
+# Submit 1 with all the information (aggregated data)
+# 
+# Arlete to send me a list of variables/levels 
+# we want for Table 1 of the papers
+#
+# Process evaluation, James and Arlete
+# -- Jim Hughes knows a lot about stepped wedge
+# 
+# After trip to the hospitals, need to update database
+# -- I'll make sure Arlete can run the R code for GitHub
+#    and Falume completes this
+#
+
 
 rm(list = ls())
 
@@ -60,6 +84,8 @@ df <- dat_in %>%
   filter(ymd(as.character(Data_entrega_1o_PCR)) > ymd("2015-10-01"))
 
 
+# result_table1 <- df %>%
+#   group_by()
 
 # create new variable for aggregate data analysis
 
@@ -70,7 +96,10 @@ df <- dat_in %>%
 # -- Exclude kids with TDR test
 
 
-df_subset <- df %>%
+# df_subset <- df %>% # initially we just checked the exclusions
+#                     # removing this line uses the exclusions for the main analysis
+
+df <- df %>%
   mutate(pcr1 = ymd(as.character(Data_entrega_1o_PCR)) ) %>%
   filter(
     # exclude people outside the study period
@@ -83,16 +112,16 @@ df_subset <- df %>%
 # next week, we'll look at individual-level data
 # to see if we can exclude the children that got two tests (PCR and TDR)
 # Some children started TARV because they came into the facility already sick.
-
-new_dat <- df_subset %>%
-  group_by(US, coorte) %>%
-  summarize(PCR = sum(PCR)) %>%
-  as.data.frame(.)
-
-write.csv(new_dat, 
-  file = "_data/newdata_aggregated_from_individual.csv",
-  row.names = FALSE
-)
+# 
+# new_dat <- df_subset %>%
+#   group_by(US, coorte) %>%
+#   summarize(PCR = sum(PCR)) %>%
+#   as.data.frame(.)
+# 
+# write.csv(new_dat, 
+#   file = "_data/newdata_aggregated_from_individual.csv",
+#   row.names = FALSE
+# )
 
 
 # -- Outcome: Time to receive PCR result after collection

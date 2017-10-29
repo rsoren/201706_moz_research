@@ -1,10 +1,10 @@
-"description","odds_ratio","lower_ci","upper_ci","pct_control_unadjusted","pct_intervencao_unadjusted","numerator","denominator"
-Among HIV positive mothers - how many did more than 2 CPP consults,3.04,2.17,4.26,0.235,0.602,numero_mulheres_HIV_mais_de_duas_CPP,numero_mulheres_HIV_1a_CPP
-Among women who did first CPP consult - how many were referred to CCR,1.77,1.3,2.41,0.376,0.529,numero_cca_expost_HIV_refer_CPP_para_CCR,numero_mulheres_HIV_1a_CPP
-Among women who did first CPP consult - how many enrolled in CCR,1.69,1.27,2.24,0.57,0.645,numero_cca_expost_HIV_ref_CPP_CCR_inscrt,numero_mulheres_HIV_1a_CPP
-Among children that began CCR - how many began TARV within 45 days of getting the PCR result,1.09,0.63,1.89,0.045,0.087,total_cca_iniciaram_TARV_ate_45dias_apos_recep_do_PCR,numero_cca_1a_CCR
-Among PCR tests that went to the laboratory - how many test results came back to the health facility,0.58,0.35,0.97,0.9,0.926,numero_PCR_recebidosdolab_ref,numero_amostras_PCR_enviados_Lab
-Among tests that came back to the health facility - how many came within 28 days,0.16,0.1,0.28,0.375,0.624,numero_PCR_recebido_ate_28dias,numero_PCR_recebidosdolab_ref
-Among samples returned to the health facility - how many were received by the patient,2.3,1.36,3.87,0.067,0.082,numero_PCR_entregue,numero_PCR_recebidosdolab_ref
-Among children enrolled in CCR - how many got the PCR test within 8 weeks,0.79,0.53,1.2,0.868,0.871,numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida,numero_cca_expost_HIV_1o_PCR
-Among the children that got a PCR test - how many receive the test result within 4 months,2.42,1.53,3.82,0.337,0.77,numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida,numero_PCR_recebidosdolab_ref
+"description","odds_ratio","lower_ci","upper_ci","p_value","pct_control_unadjusted","pct_intervencao_unadjusted","numerator","denominator"
+Among HIV positive mothers - how many did more than 2 CPP consults,3.04,2.17,4.26,0,0.235,0.602,numero_mulheres_HIV_mais_de_duas_CPP,numero_mulheres_HIV_1a_CPP
+Among women who did first CPP consult - how many were referred to CCR,1.77,1.3,2.41,0.0003,0.376,0.529,numero_cca_expost_HIV_refer_CPP_para_CCR,numero_mulheres_HIV_1a_CPP
+Among women who did first CPP consult - how many enrolled in CCR,1.69,1.27,2.24,0.0003,0.57,0.645,numero_cca_expost_HIV_ref_CPP_CCR_inscrt,numero_mulheres_HIV_1a_CPP
+Among children that began CCR - how many began TARV within 45 days of getting the PCR result,1.09,0.63,1.89,0.7533,0.045,0.087,total_cca_iniciaram_TARV_ate_45dias_apos_recep_do_PCR,numero_cca_1a_CCR
+Among PCR tests that went to the laboratory - how many test results came back to the health facility,0.58,0.35,0.97,0.0372,0.9,0.926,numero_PCR_recebidosdolab_ref,numero_amostras_PCR_enviados_Lab
+Among tests that came back to the health facility - how many came within 28 days,0.16,0.1,0.28,0,0.375,0.624,numero_PCR_recebido_ate_28dias,numero_PCR_recebidosdolab_ref
+Among samples returned to the health facility - how many were received by the patient,2.3,1.36,3.87,0.0018,0.067,0.082,numero_PCR_entregue,numero_PCR_recebidosdolab_ref
+Among children enrolled in CCR - how many got the PCR test within 8 weeks,0.79,0.53,1.2,0.2701,0.868,0.871,numero_cca_expost_HIV_fez_1o_PCR_Idade_48_semanas_de_vida,numero_cca_expost_HIV_1o_PCR
+Among the children that got a PCR test - how many receive the test result within 4 months,2.42,1.53,3.82,0.0002,0.337,0.77,numero_cca_expost_HIV_recebeu_PCR_com_idade_816_semanas_de_vida,numero_PCR_recebidosdolab_ref
